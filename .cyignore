@@ -1,0 +1,59 @@
+# Upstream Mbed TLS (github.com/ARMmbed/mbedtls) is not ModusToolbox-aware: it
+# ships no .cyignore and no *.mk of its own. MTB auto-discovery therefore globs
+# every .c/.S in the asset and adds every header-bearing directory to -I, which
+# breaks the build in three ways:
+#
+#   1. same-basename .c/.S pairs produce duplicate object files,
+#   2. host/test headers shadow libc headers (e.g. framework/.../time.h),
+#   3. host-only sources (net_sockets.c, POSIX file I/O) fail to compile.
+#
+# These rules are carried here so that an application only has to add the
+# mbedtls .mtb - mbedtls-pal is pulled in automatically as a dependency and
+# supplies the exclusions on the application's behalf.
+#
+# Adapted from wifi-core-freertos-lwip-mbedtls/.cyignore. In Mbed TLS 4.x
+# tf-psa-crypto is bundled in-tree, so the rules that reference the separate
+# ifx-tf-psa-crypto asset in 3.x are remapped onto $(SEARCH_mbedtls)/tf-psa-crypto.
+
+$(SEARCH_mbedtls)/tests
+$(SEARCH_mbedtls)/3rdparty
+$(SEARCH_mbedtls)/ChangeLog
+$(SEARCH_mbedtls)/ChangeLog.d
+$(SEARCH_mbedtls)/cmake
+$(SEARCH_mbedtls)/configs
+$(SEARCH_mbedtls)/docs
+$(SEARCH_mbedtls)/doxygen
+$(SEARCH_mbedtls)/output
+$(SEARCH_mbedtls)/programs
+$(SEARCH_mbedtls)/scripts
+$(SEARCH_mbedtls)/framework
+$(SEARCH_mbedtls)/tmp
+$(SEARCH_mbedtls)/visualc
+$(SEARCH_mbedtls)/library/mbedtls_config.c
+
+# POSIX/Windows sockets - not valid on bare metal (MBEDTLS_NET_C is undefined
+# in configs/mbedtls_user_config.h).
+$(SEARCH_mbedtls)/library/net_sockets.c
+
+$(SEARCH_mbedtls)/tf-psa-crypto/core/tf_psa_crypto_config.c
+$(SEARCH_mbedtls)/tf-psa-crypto/programs
+$(SEARCH_mbedtls)/tf-psa-crypto/framework
+$(SEARCH_mbedtls)/tf-psa-crypto/tests
+$(SEARCH_mbedtls)/tf-psa-crypto/cmake
+$(SEARCH_mbedtls)/tf-psa-crypto/configs
+$(SEARCH_mbedtls)/tf-psa-crypto/docs
+$(SEARCH_mbedtls)/tf-psa-crypto/doxygen
+$(SEARCH_mbedtls)/tf-psa-crypto/scripts
+$(SEARCH_mbedtls)/tf-psa-crypto/ChangeLog.d
+
+# mldsa-native ships hand-written assembly alongside same-named C sources,
+# which collide in a flat object directory.
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/examples
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/dev
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/test
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/tests
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/scripts
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/proofs
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/mldsa/mldsa_native.S
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/pqcp/mldsa-native/mldsa/src
+$(SEARCH_mbedtls)/tf-psa-crypto/drivers/everest
